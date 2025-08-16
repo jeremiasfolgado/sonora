@@ -1,0 +1,607 @@
+.tunerContainer {
+  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1rem;
+  background: linear-gradient(
+    135deg,
+    var(--bg-primary) 0%,
+    var(--bg-secondary) 50%,
+    var(--bg-tertiary) 100%
+  );
+  overflow: hidden;
+  gap: 0.5rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 0.5rem;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--accent-color)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.25rem;
+  text-shadow: 0 0 20px rgba(79, 70, 229, 0.3);
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 600px;
+  min-height: 0;
+  padding: 0.5rem 0;
+  overflow: hidden;
+}
+
+.noteDisplay {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.noteName {
+  font-size: 5rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+  margin-bottom: 0.25rem;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.1em;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--accent-color)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+}
+
+.frequency {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 0.5rem;
+}
+
+.additionalInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  max-width: 400px;
+  flex-shrink: 0;
+  margin: 0.5rem 0;
+  z-index: 5;
+}
+
+.infoRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+}
+
+.stringIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--accent-color)
+  );
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+  min-width: 180px;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: 0.5rem 0;
+  z-index: 5;
+}
+
+.stringLabel {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.stringName {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.stringNumber {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.2rem 0.4rem;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 25px;
+  text-align: center;
+}
+
+.confidenceBar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.confidenceMeter {
+  width: 80px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.confidenceFill {
+  height: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+  border-radius: 3px;
+}
+
+.stringInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.4rem 0.8rem;
+  border-radius: 15px;
+}
+
+.stringInfo strong {
+  color: var(--text-primary);
+}
+
+.stabilityWarning {
+  font-size: 0.75rem;
+  color: var(--warning-color);
+  font-style: italic;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  z-index: 5;
+  width: 100%;
+  max-width: 400px;
+}
+
+.toggleButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  color: white;
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+  flex-shrink: 0;
+}
+
+.toggleButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+}
+
+.toggleButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.toggleButton.listening {
+  background: linear-gradient(135deg, var(--error-color), #dc2626);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.toggleButton.listening:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+.toggleButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.testButton {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(
+    135deg,
+    var(--accent-color),
+    var(--secondary-color)
+  );
+  color: white;
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+  flex-shrink: 0;
+}
+
+.testButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+}
+
+.testButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.testButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.stringTestButtons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  max-width: 800px;
+  flex-shrink: 0;
+  z-index: 5;
+  width: 100%;
+}
+
+.testLabel {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin: 0;
+  text-align: center;
+}
+
+.stringButtons {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+.stringButton {
+  padding: 0.5rem 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.stringButton:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--accent-color);
+  transform: translateY(-1px);
+}
+
+.stringButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.stringButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.errorMessage {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--error-color);
+  border-radius: 8px;
+  color: var(--error-color);
+  font-weight: 500;
+  max-width: 400px;
+  text-align: center;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  margin: 0.5rem 0;
+  z-index: 5;
+}
+
+.instructions {
+  text-align: center;
+  color: var(--text-secondary);
+  max-width: 400px;
+  flex-shrink: 0;
+  margin: 0.5rem 0;
+  z-index: 5;
+}
+
+.instructions p {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.quickTips {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+.footer {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: auto;
+  flex-shrink: 0;
+  z-index: 5;
+  padding: 0.5rem 0;
+}
+
+.errorContainer {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  gap: 1.5rem;
+}
+
+.errorContainer h2 {
+  color: var(--error-color);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.errorContainer p {
+  color: var(--text-secondary);
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+.loadingContainer {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  gap: 1.5rem;
+}
+
+.loadingContainer h2 {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.loadingContainer p {
+  color: var(--text-secondary);
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-left-color: var(--accent-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.retryButton {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--accent-color);
+  color: white;
+  margin-top: 1rem;
+}
+
+.retryButton:hover {
+  background: var(--secondary-color);
+  transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tunerContainer {
+    padding: 0.75rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+  }
+
+  .noteName {
+    font-size: 4rem;
+  }
+
+  .frequency {
+    font-size: 1.1rem;
+  }
+
+  .mainContent {
+    gap: 1.25rem;
+  }
+
+  .toggleButton {
+    padding: 0.7rem 1.4rem;
+    font-size: 0.9rem;
+  }
+
+  .additionalInfo {
+    gap: 0.4rem;
+  }
+
+  .confidenceBar {
+    font-size: 0.75rem;
+  }
+
+  .confidenceMeter {
+    width: 70px;
+  }
+
+  .stringInfo {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.7rem;
+  }
+
+  .stringIndicator {
+    min-width: 160px;
+    padding: 0.45rem 0.9rem;
+  }
+
+  .stringName {
+    font-size: 0.9rem;
+  }
+
+  .stringButtons {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+    max-width: 500px;
+  }
+
+  .stringButton {
+    padding: 0.45rem 0.35rem;
+    font-size: 0.7rem;
+    min-height: 35px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tunerContainer {
+    padding: 0.5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .noteName {
+    font-size: 3.5rem;
+  }
+
+  .toggleButton {
+    padding: 0.65rem 1.3rem;
+    font-size: 0.85rem;
+  }
+
+  .noteDisplay {
+    margin-bottom: 0.4rem;
+  }
+
+  .additionalInfo {
+    gap: 0.35rem;
+  }
+
+  .stringIndicator {
+    min-width: 140px;
+    padding: 0.4rem 0.8rem;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .stringName {
+    font-size: 0.8rem;
+  }
+
+  .stringButtons {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.3rem;
+    max-width: 400px;
+  }
+
+  .stringButton {
+    padding: 0.4rem 0.3rem;
+    font-size: 0.65rem;
+    min-height: 32px;
+  }
+
+  .mainContent {
+    gap: 1rem;
+  }
+}
