@@ -16,12 +16,11 @@ export function Needle({
   tuningColor,
   isListening,
 }: NeedleProps) {
-  // Calcular el ángulo de rotación de la aguja
-  // -50 cents = -45 grados, +50 cents = +45 grados
+  // Calcular la posición horizontal del indicador
+  // -50 cents = 0%, +50 cents = 100%
   const maxCents = 50;
-  const maxAngle = 45;
   const clampedCents = Math.max(-maxCents, Math.min(maxCents, cents));
-  const rotation = (clampedCents / maxCents) * maxAngle;
+  const position = ((clampedCents + maxCents) / (maxCents * 2)) * 100;
 
   return (
     <div className={styles.needleContainer}>
@@ -32,11 +31,11 @@ export function Needle({
         </span>
       </div>
 
-      {/* Contenedor de la aguja */}
+      {/* Contenedor del indicador horizontal */}
       <div className={styles.needleWrapper}>
         {/* Marcadores de cents */}
         <div className={styles.centsMarkers}>
-          <div className={styles.marker} style={{ left: '10%' }}>
+          <div className={styles.marker} style={{ left: '0%' }}>
             -50
           </div>
           <div className={styles.marker} style={{ left: '25%' }}>
@@ -48,26 +47,24 @@ export function Needle({
           <div className={styles.marker} style={{ left: '75%' }}>
             +25
           </div>
-          <div className={styles.marker} style={{ right: '10%' }}>
+          <div className={styles.marker} style={{ left: '100%' }}>
             +50
           </div>
         </div>
 
-        {/* Línea central */}
-        <div className={styles.centerLine} />
-
-        {/* Aguja */}
-        <div
-          className={`${styles.needle} ${isListening ? styles.active : ''}`}
-          style={
-            {
-              transform: `rotate(${rotation}deg)`,
+        {/* Línea central con gradiente */}
+        <div className={styles.centerLine}>
+          {/* Indicador deslizante */}
+          <div
+            className={`${styles.sliderIndicator} ${isListening ? styles.active : ''}`}
+            style={{
+              left: `${position}%`,
               '--tuning-color': tuningColor,
-            } as React.CSSProperties
-          }
-        >
-          <div className={styles.needleTip} />
-          <div className={styles.needleBody} />
+            } as React.CSSProperties}
+          >
+            <div className={styles.indicatorDot} />
+            <div className={styles.indicatorLine} />
+          </div>
         </div>
 
         {/* Punto central */}

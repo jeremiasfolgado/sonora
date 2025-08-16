@@ -37,20 +37,20 @@ describe('Needle Component', () => {
 
   it('applies active class when listening', () => {
     render(<Needle {...defaultProps} isListening={true} />);
-    const needle = screen
+    const sliderIndicator = screen
       .getByText('AFINADO')
       .closest('.needleContainer')
-      ?.querySelector('.needle');
-    expect(needle).toHaveClass('active');
+      ?.querySelector('.sliderIndicator');
+    expect(sliderIndicator).toHaveClass('active');
   });
 
   it('does not apply active class when not listening', () => {
     render(<Needle {...defaultProps} isListening={false} />);
-    const needle = screen
+    const sliderIndicator = screen
       .getByText('AFINADO')
       .closest('.needleContainer')
-      ?.querySelector('.needle');
-    expect(needle).not.toHaveClass('active');
+      ?.querySelector('.sliderIndicator');
+    expect(sliderIndicator).not.toHaveClass('active');
   });
 
   it('displays all cent markers', () => {

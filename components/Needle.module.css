@@ -45,16 +45,12 @@
   transform: translateX(-50%);
 }
 
-.marker:last-child {
-  transform: translateX(50%);
-}
-
 .centerLine {
   position: absolute;
   top: 50%;
   left: 0;
   right: 0;
-  height: 2px;
+  height: 4px;
   background: linear-gradient(
     to right,
     transparent 0%,
@@ -63,44 +59,42 @@
     transparent 100%
   );
   transform: translateY(-50%);
+  border-radius: 2px;
 }
 
-.needle {
+.sliderIndicator {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: left 0.1s ease-out;
+  z-index: 10;
+}
+
+.sliderIndicator.active {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.indicatorDot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  background: var(--tuning-color);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 15px var(--tuning-color);
+  border: 3px solid var(--bg-secondary);
+}
+
+.indicatorLine {
   position: absolute;
   top: 50%;
   left: 50%;
   width: 4px;
-  height: 80px;
-  transform-origin: center bottom;
-  transition: transform 0.1s ease-out;
-  z-index: 10;
-}
-
-.needle.active {
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.needleTip {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-bottom: 12px solid var(--tuning-color);
-  transform: translateX(-50%);
-  filter: drop-shadow(0 0 8px var(--tuning-color));
-}
-
-.needleBody {
-  position: absolute;
-  top: 12px;
-  left: 50%;
-  width: 4px;
-  height: 68px;
+  height: 40px;
   background: var(--tuning-color);
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   border-radius: 2px;
   box-shadow: 0 0 10px var(--tuning-color);
 }
@@ -141,12 +135,8 @@
     height: 150px;
   }
 
-  .needle {
-    height: 60px;
-  }
-
-  .needleBody {
-    height: 48px;
+  .indicatorLine {
+    height: 30px;
   }
 
   .centsMarkers {

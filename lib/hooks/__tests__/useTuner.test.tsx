@@ -53,6 +53,12 @@ describe('useTuner Hook', () => {
     ).AudioAnalyzer;
     AudioAnalyzerMock.isSupported = jest.fn().mockReturnValue(true);
     AudioAnalyzerMock.isMediaDevicesSupported = jest.fn().mockReturnValue(true);
+
+    // Mock de Aubio
+    Object.defineProperty(window, 'aubio', {
+      value: jest.fn().mockResolvedValue({}),
+      writable: true,
+    });
   });
 
   it('initializes with correct default state', () => {
@@ -84,13 +90,20 @@ describe('useTuner Hook', () => {
     expect(typeof result.current.toggleListening).toBe('function');
   });
 
-  it('handles frequency detection events', async () => {
+  it('handles note detection events', async () => {
     const { result } = renderHook(() => useTuner());
 
-    // Simular evento de frecuencia detectada
+    // Simular evento de nota detectada
     act(() => {
-      const event = new CustomEvent('frequencyDetected', {
-        detail: { frequency: 440 },
+      const event = new CustomEvent('noteDetected', {
+        detail: { 
+          noteData: {
+            name: 'A',
+            frequency: 440,
+            octave: 4,
+            cents: 0
+          }
+        },
       });
       window.dispatchEvent(event);
     });
@@ -108,7 +121,7 @@ describe('useTuner Hook', () => {
     unmount();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith(
-      'frequencyDetected',
+      'noteDetected',
       expect.any(Function)
     );
   });
