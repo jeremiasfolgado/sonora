@@ -1,4 +1,4 @@
-import { TunerUI } from '../components/TunerUI';
+import { TunerUI } from '../components/tuner/TunerUI';
 
 export const dynamic = 'force-dynamic';
 

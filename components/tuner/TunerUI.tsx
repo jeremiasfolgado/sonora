@@ -1,17 +1,17 @@
 'use client';
 
-import { useTuner } from '../lib/hooks/useTuner';
-import { useTuning } from '../lib/hooks/useTuning';
-import { useTunerUtils } from '../lib/hooks/useTunerUtils';
+import { useTuner } from '../../lib/hooks/useTuner';
+import { useTuning } from '../../lib/hooks/useTuning';
+import { useTunerUtils } from '../../lib/hooks/useTunerUtils';
 import styles from './TunerUI.module.css';
-import { Needle } from './Needle';
+import { Needle } from '../common/Needle';
 import { TunerHeader } from './TunerHeader';
 import { NoteDisplay } from './NoteDisplay';
 import { StringIndicator } from './StringIndicator';
 import { TuningControls } from './TuningControls';
 import { AdditionalInfo } from './AdditionalInfo';
 import { StringTestButtons } from './StringTestButtons';
-import { TunerFooter } from './TunerFooter';
+import { TunerFooter } from '../layout/TunerFooter';
 import { BrowserNotSupported } from './BrowserNotSupported';
 
 export function TunerUI() {

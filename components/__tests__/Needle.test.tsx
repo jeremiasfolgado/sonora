@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { Needle } from '../Needle';
+import { Needle } from '../common/Needle';
 
 describe('Needle Component', () => {
   const defaultProps = {

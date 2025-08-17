@@ -1,4 +1,5 @@
 :root {
+  /* Variables existentes para compatibilidad */
   --background: #ffffff;
   --foreground: #171717;
   --bg-primary: #ffffff;
@@ -18,6 +19,34 @@
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
   --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
+
+  /* Nuevas variables para futuras herramientas */
+  --primary-color: #6366f1;
+  --primary-hover: #4f46e5;
+  --success-color-light: rgba(40, 167, 69, 0.1);
+  --surface-color: #f8fafc;
+  --text-color: #1e293b;
+  --text-muted: #94a3b8;
+  --border-radius-sm: 6px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
 }
 
 @media (prefers-color-scheme: dark) {
