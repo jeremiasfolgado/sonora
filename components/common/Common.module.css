@@ -47,3 +47,39 @@
   text-align: center;
   font-weight: 500;
 }
+
+/* Platform Info */
+.platformInfo {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--surface-color);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.iosTips,
+.androidTips {
+  margin-bottom: 1rem;
+}
+
+.iosTips h4,
+.androidTips h4 {
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.iosTips ul,
+.androidTips ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.iosTips li,
+.androidTips li {
+  margin-bottom: 0.25rem;
+}

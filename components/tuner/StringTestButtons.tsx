@@ -10,44 +10,101 @@ export function StringTestButtons({
   isSupported,
   getAdjustedStringName,
 }: StringTestButtonsProps) {
-  // Función para generar tonos de cuerdas de guitarra específicas
-  const testGuitarString = (stringName: string) => {
+  // Detectar si es iOS
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+  // Función para generar tonos de cuerdas de guitarra específicas optimizada para iOS
+  const testGuitarString = async (stringName: string) => {
     if (!isSupported) return;
 
     try {
-      const audioContext = new (window.AudioContext ||
+      // Crear Audio Context optimizado para la plataforma
+      const AudioContextClass =
+        window.AudioContext ||
         (window as unknown as { webkitAudioContext: typeof AudioContext })
-          .webkitAudioContext)();
+          .webkitAudioContext;
 
+      // Configuración específica para iOS
+      const audioContextOptions = isIOS
+        ? {
+            sampleRate: 44100,
+            latencyHint: 'interactive' as const,
+          }
+        : {};
+
+      const audioContext = new AudioContextClass(audioContextOptions);
+
+      // Crear Oscillator y Gain
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
 
       // Obtener la frecuencia ajustada de la cuerda
       const adjustedFrequency = getGuitarStringFrequency(stringName);
 
-      oscillator.frequency.setValueAtTime(
-        adjustedFrequency,
-        audioContext.currentTime
-      );
-      oscillator.type = 'sine';
+      // Configuración específica para iOS
+      if (isIOS) {
+        // iOS requiere frecuencias enteras para mejor rendimiento
+        const roundedFrequency = Math.round(adjustedFrequency);
+        oscillator.frequency.setValueAtTime(
+          roundedFrequency,
+          audioContext.currentTime
+        );
 
-      gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(
-        0.01,
-        audioContext.currentTime + 3
-      );
+        // iOS funciona mejor con ondas sinusoidales
+        oscillator.type = 'sine';
 
+        // Gain más bajo para iOS para evitar distorsión
+        gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.001,
+          audioContext.currentTime + 2
+        );
+      } else {
+        // Configuración estándar para otras plataformas
+        oscillator.frequency.setValueAtTime(
+          adjustedFrequency,
+          audioContext.currentTime
+        );
+        oscillator.type = 'sine';
+
+        gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioContext.currentTime + 3
+        );
+      }
+
+      // Conectar nodos
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
 
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 3);
+      // Iniciar y detener con timing optimizado para iOS
+      const startTime = audioContext.currentTime;
+      const duration = isIOS ? 2 : 3; // iOS: 2 segundos, otros: 3 segundos
 
+      oscillator.start(startTime);
+      oscillator.stop(startTime + duration);
+
+      // Cleanup optimizado para iOS
       setTimeout(() => {
-        audioContext.close();
-      }, 3500);
+        try {
+          // Solo cerrar si no hay otros sonidos reproduciéndose
+          if (audioContext.state === 'running') {
+            audioContext.close();
+          }
+        } catch (error) {
+          console.warn('Error cerrando Audio Context:', error);
+        }
+      }, (duration + 0.5) * 1000);
     } catch (error) {
       console.error(`Error generando tono ${stringName}:`, error);
+
+      // Mostrar mensaje específico para iOS
+      if (isIOS) {
+        alert(
+          'En iOS, asegúrate de tocar el botón directamente y permitir el acceso al audio.'
+        );
+      }
     }
   };
 

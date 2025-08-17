@@ -5,6 +5,7 @@ import { useTuning } from '../../lib/hooks/useTuning';
 import { useTunerUtils } from '../../lib/hooks/useTunerUtils';
 import styles from './TunerUI.module.css';
 import { Needle } from '../common/Needle';
+import { PlatformInfo } from '../common/PlatformInfo';
 import { TunerHeader } from './TunerHeader';
 import { NoteDisplay } from './NoteDisplay';
 import { StringIndicator } from './StringIndicator';
@@ -118,6 +119,9 @@ export function TunerUI() {
             </div>
           </div>
         )}
+
+        {/* Información específica de plataforma */}
+        <PlatformInfo />
       </div>
 
       <StringTestButtons
