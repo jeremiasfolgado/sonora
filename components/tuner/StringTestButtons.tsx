@@ -1,14 +1,15 @@
-import { getGuitarStringFrequency } from '../../lib/audio/notes';
 import styles from './TunerUI.module.css';
 
 interface StringTestButtonsProps {
   isSupported: boolean;
   getAdjustedStringName: (stringName: string) => string;
+  getAdjustedFrequency: (baseFrequency: number) => number;
 }
 
 export function StringTestButtons({
   isSupported,
   getAdjustedStringName,
+  getAdjustedFrequency,
 }: StringTestButtonsProps) {
   // Función para generar tonos de cuerdas de guitarra
   const testGuitarString = async (stringName: string) => {
@@ -22,8 +23,11 @@ export function StringTestButtons({
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
 
-      // Obtener la frecuencia ajustada de la cuerda
-      const adjustedFrequency = getGuitarStringFrequency(stringName);
+      // Obtener la frecuencia base y ajustarla según la afinación seleccionada
+      const stringInfo = guitarStrings.find((s) => s.name === stringName);
+      if (!stringInfo) return;
+
+      const adjustedFrequency = getAdjustedFrequency(stringInfo.baseFreq);
 
       // Configuración estándar
       oscillator.frequency.setValueAtTime(
@@ -65,13 +69,23 @@ export function StringTestButtons({
     }
   };
 
+  // Frecuencias base de afinación estándar (A4 = 440Hz)
+  const baseFrequencies = {
+    E2: 82.41,
+    A2: 110.0,
+    D3: 146.83,
+    G3: 196.0,
+    B3: 246.94,
+    E4: 329.63,
+  };
+
   const guitarStrings = [
-    { name: 'E2', label: '6ª' },
-    { name: 'A2', label: '5ª' },
-    { name: 'D3', label: '4ª' },
-    { name: 'G3', label: '3ª' },
-    { name: 'B3', label: '2ª' },
-    { name: 'E4', label: '1ª' },
+    { name: 'E2', label: '6ª', baseFreq: baseFrequencies.E2 },
+    { name: 'A2', label: '5ª', baseFreq: baseFrequencies.A2 },
+    { name: 'D3', label: '4ª', baseFreq: baseFrequencies.D3 },
+    { name: 'G3', label: '3ª', baseFreq: baseFrequencies.G3 },
+    { name: 'B3', label: '2ª', baseFreq: baseFrequencies.B3 },
+    { name: 'E4', label: '1ª', baseFreq: baseFrequencies.E4 },
   ];
 
   return (

@@ -37,6 +37,7 @@ export function TunerUI() {
     resetTuning,
     customSemitones,
     totalSemitones,
+    getAdjustedFrequency,
   } = useTuning();
 
   const { getTargetFrequency, getAdjustedStringName } = useTunerUtils();
@@ -128,6 +129,7 @@ export function TunerUI() {
       <StringTestButtons
         isSupported={isSupported}
         getAdjustedStringName={getAdjustedStringName}
+        getAdjustedFrequency={getAdjustedFrequency}
       />
 
       <TunerFooter />
