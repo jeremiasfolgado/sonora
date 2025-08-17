@@ -47,3 +47,71 @@
   text-align: center;
   font-weight: 500;
 }
+
+/* Platform Info */
+.platformInfo {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--surface-color);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.mobileTips {
+  margin-bottom: 1rem;
+}
+
+.mobileTips h4 {
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.mobileTips ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.mobileTips li {
+  margin-bottom: 0.25rem;
+}
+
+/* Force Support Section */
+.forceSupportSection {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  width: 100%;
+}
+
+.forceSupportText {
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.forceSupportButton {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  margin-bottom: 1rem;
+}
+
+.forceSupportButton:hover {
+  background: var(--accent-hover);
+}
+
+.forceSupportNote {
+  color: var(--text-tertiary);
+  font-size: 0.8rem;
+  font-style: italic;
+}

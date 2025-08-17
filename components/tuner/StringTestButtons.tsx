@@ -10,21 +10,22 @@ export function StringTestButtons({
   isSupported,
   getAdjustedStringName,
 }: StringTestButtonsProps) {
-  // Función para generar tonos de cuerdas de guitarra específicas
-  const testGuitarString = (stringName: string) => {
+  // Función para generar tonos de cuerdas de guitarra
+  const testGuitarString = async (stringName: string) => {
     if (!isSupported) return;
 
     try {
-      const audioContext = new (window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext })
-          .webkitAudioContext)();
+      // Crear Audio Context estándar
+      const audioContext = new window.AudioContext();
 
+      // Crear Oscillator y Gain
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
 
       // Obtener la frecuencia ajustada de la cuerda
       const adjustedFrequency = getGuitarStringFrequency(stringName);
 
+      // Configuración estándar
       oscillator.frequency.setValueAtTime(
         adjustedFrequency,
         audioContext.currentTime
@@ -37,15 +38,28 @@ export function StringTestButtons({
         audioContext.currentTime + 3
       );
 
+      // Conectar nodos
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
 
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 3);
+      // Iniciar y detener
+      const startTime = audioContext.currentTime;
+      const duration = 3; // 3 segundos
 
+      oscillator.start(startTime);
+      oscillator.stop(startTime + duration);
+
+      // Cleanup
       setTimeout(() => {
-        audioContext.close();
-      }, 3500);
+        try {
+          // Solo cerrar si no hay otros sonidos reproduciéndose
+          if (audioContext.state === 'running') {
+            audioContext.close();
+          }
+        } catch (error) {
+          console.warn('Error cerrando Audio Context:', error);
+        }
+      }, (duration + 0.5) * 1000);
     } catch (error) {
       console.error(`Error generando tono ${stringName}:`, error);
     }

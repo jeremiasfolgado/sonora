@@ -20,12 +20,14 @@ export interface TunerState {
   confidence: number;
   closestString: string;
   isStable: boolean;
+  forceSupported: boolean; // Nuevo: permite forzar compatibilidad
 }
 
 export interface UseTunerReturn extends TunerState {
   startListening: () => Promise<void>;
   stopListening: () => void;
   toggleListening: () => Promise<void>;
+  forceSupport: () => void; // Nueva función para forzar compatibilidad
 }
 
 export function useTuner(): UseTunerReturn {
@@ -46,6 +48,7 @@ export function useTuner(): UseTunerReturn {
     confidence: 0,
     closestString: '--',
     isStable: false,
+    forceSupported: false, // Inicialmente false
   });
 
   const analyzerRef = useRef<AudioAnalyzer | null>(null);
@@ -53,29 +56,53 @@ export function useTuner(): UseTunerReturn {
 
   useEffect(() => {
     const checkSupport = () => {
-      // Detección más permisiva para dispositivos móviles
-      const hasAudioContext = AudioAnalyzer.isSupported();
-      const hasMediaDevices = AudioAnalyzer.isMediaDevicesSupported();
+      try {
+        // Verificación directa y explícita
+        const hasAudioContext = !!window.AudioContext;
 
-      // Detectar si es dispositivo móvil
-      const isMobile =
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
+        const hasMediaDevices = !!(
+          navigator.mediaDevices && navigator.mediaDevices.getUserMedia
         );
 
-      // En móviles, solo necesitamos AudioContext
-      // En desktop, necesitamos ambos
-      const isSupported = hasAudioContext && (isMobile || hasMediaDevices);
+        // Verificación adicional: intentar crear un AudioContext de prueba
+        let canCreateAudioContext = false;
+        try {
+          const testContext = new window.AudioContext();
+          canCreateAudioContext =
+            testContext.state === 'running' ||
+            testContext.state === 'suspended';
+          testContext.close();
+        } catch {
+          canCreateAudioContext = false;
+        }
 
-      setState((prev) => ({ ...prev, isSupported }));
-      return isSupported;
+        const isSupported =
+          (hasAudioContext && hasMediaDevices && canCreateAudioContext) ||
+          state.forceSupported;
+
+        setState((prev) => ({ ...prev, isSupported }));
+        return isSupported;
+      } catch (error) {
+        setState((prev) => ({ ...prev, isSupported: false }));
+        return false;
+      }
     };
 
     // Solo verificar si estamos en el cliente
     if (typeof window !== 'undefined') {
+      // Verificación inmediata
       checkSupport();
+
+      // Verificación adicional después de un delay
+      setTimeout(checkSupport, 500);
+
+      // Verificación final después de 1 segundo
+      setTimeout(checkSupport, 1000);
+
+      // Verificación adicional después de 2 segundos (para casos edge)
+      setTimeout(checkSupport, 2000);
     }
-  }, []);
+  }, [state.forceSupported]);
 
   // Inicializar analizador solo cuando esté soportado
   useEffect(() => {
@@ -103,7 +130,6 @@ export function useTuner(): UseTunerReturn {
         analyzerRef.current = new AudioAnalyzer();
         isInitializedRef.current = true;
       } catch (error) {
-        console.error('Error inicializando analizador:', error);
         setState((prev) => ({
           ...prev,
           error: 'Failed to initialize audio analyzer',
@@ -113,7 +139,7 @@ export function useTuner(): UseTunerReturn {
     };
 
     initAnalyzer();
-  }, [state.isSupported]);
+  }, [state.isSupported, state.forceSupported]);
 
   // Configurar listener para frecuencias detectadas
   useEffect(() => {
@@ -234,10 +260,15 @@ export function useTuner(): UseTunerReturn {
     }
   }, [state.isListening, startListening, stopListening]);
 
+  const forceSupport = () => {
+    setState((prev) => ({ ...prev, forceSupported: true, isSupported: true }));
+  };
+
   return {
     ...state,
     startListening,
     stopListening,
     toggleListening,
+    forceSupport,
   };
 }

@@ -80,9 +80,7 @@ export class AudioAnalyzer {
       }
 
       // Crear contexto de audio
-      this.audioContext = new (window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext })
-          .webkitAudioContext)();
+      this.audioContext = new window.AudioContext();
 
       // Obtener acceso al micrófono con manejo de errores detallado
       try {
@@ -270,18 +268,39 @@ export class AudioAnalyzer {
    * Verifica si el navegador soporta Web Audio API
    */
   static isSupported(): boolean {
-    return !!(
-      window.AudioContext ||
-      (window as unknown as { webkitAudioContext: typeof AudioContext })
-        .webkitAudioContext
-    );
+    try {
+      if (typeof window === 'undefined') return false;
+
+      const hasAudioContext = !!window.AudioContext;
+
+      if (!hasAudioContext) return false;
+
+      // Verificación adicional: intentar crear un AudioContext de prueba
+      try {
+        const testContext = new window.AudioContext();
+        const isValid =
+          testContext.state === 'running' || testContext.state === 'suspended';
+        testContext.close();
+        return isValid;
+      } catch {
+        return false;
+      }
+    } catch {
+      return false;
+    }
   }
 
   /**
    * Verifica si el navegador soporta getUserMedia
    */
   static isMediaDevicesSupported(): boolean {
-    return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    try {
+      if (typeof navigator === 'undefined') return false;
+
+      return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    } catch {
+      return false;
+    }
   }
 
   /**
