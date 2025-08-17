@@ -20,12 +20,14 @@ export interface TunerState {
   confidence: number;
   closestString: string;
   isStable: boolean;
+  forceSupported: boolean; // Nuevo: permite forzar compatibilidad
 }
 
 export interface UseTunerReturn extends TunerState {
   startListening: () => Promise<void>;
   stopListening: () => void;
   toggleListening: () => Promise<void>;
+  forceSupport: () => void; // Nueva función para forzar compatibilidad
 }
 
 export function useTuner(): UseTunerReturn {
@@ -46,6 +48,7 @@ export function useTuner(): UseTunerReturn {
     confidence: 0,
     closestString: '--',
     isStable: false,
+    forceSupported: false, // Inicialmente false
   });
 
   const analyzerRef = useRef<AudioAnalyzer | null>(null);
@@ -53,15 +56,67 @@ export function useTuner(): UseTunerReturn {
 
   useEffect(() => {
     const checkSupport = () => {
-      const isSupported =
-        AudioAnalyzer.isSupported() && AudioAnalyzer.isMediaDevicesSupported();
-      setState((prev) => ({ ...prev, isSupported }));
-      return isSupported;
+      try {
+        // Verificación directa y explícita
+        const hasAudioContext = !!(
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext })
+            .webkitAudioContext
+        );
+
+        const hasMediaDevices = !!(
+          navigator.mediaDevices && navigator.mediaDevices.getUserMedia
+        );
+
+        // Verificación adicional: intentar crear un AudioContext de prueba
+        let canCreateAudioContext = false;
+        try {
+          const testContext = new (window.AudioContext ||
+            (window as unknown as { webkitAudioContext: typeof AudioContext })
+              .webkitAudioContext)();
+          canCreateAudioContext =
+            testContext.state === 'running' ||
+            testContext.state === 'suspended';
+          testContext.close();
+        } catch {
+          canCreateAudioContext = false;
+        }
+
+        const isSupported =
+          (hasAudioContext && hasMediaDevices && canCreateAudioContext) ||
+          state.forceSupported;
+
+        console.log('🔍 VERIFICACIÓN DE COMPATIBILIDAD:', {
+          hasAudioContext,
+          hasMediaDevices,
+          canCreateAudioContext,
+          isSupported,
+          userAgent: navigator.userAgent,
+          timestamp: new Date().toISOString(),
+        });
+
+        setState((prev) => ({ ...prev, isSupported }));
+        return isSupported;
+      } catch (error) {
+        console.error('❌ Error verificando compatibilidad:', error);
+        setState((prev) => ({ ...prev, isSupported: false }));
+        return false;
+      }
     };
 
     // Solo verificar si estamos en el cliente
     if (typeof window !== 'undefined') {
+      // Verificación inmediata
       checkSupport();
+
+      // Verificación adicional después de un delay
+      setTimeout(checkSupport, 500);
+
+      // Verificación final después de 1 segundo
+      setTimeout(checkSupport, 1000);
+
+      // Verificación adicional después de 2 segundos (para casos edge)
+      setTimeout(checkSupport, 2000);
     }
   }, []);
 
@@ -222,10 +277,16 @@ export function useTuner(): UseTunerReturn {
     }
   }, [state.isListening, startListening, stopListening]);
 
+  const forceSupport = () => {
+    console.log('🔧 Forzando compatibilidad del navegador...');
+    setState((prev) => ({ ...prev, forceSupported: true, isSupported: true }));
+  };
+
   return {
     ...state,
     startListening,
     stopListening,
     toggleListening,
+    forceSupport,
   };
 }

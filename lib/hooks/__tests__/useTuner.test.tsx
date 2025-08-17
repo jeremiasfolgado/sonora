@@ -29,12 +29,22 @@ describe('useTuner Hook', () => {
     jest.clearAllMocks();
 
     // Mock de las APIs del navegador
+    const mockAudioContext = jest.fn().mockImplementation(() => ({
+      createAnalyser: jest.fn(),
+      createMediaStreamSource: jest.fn(),
+      createScriptProcessor: jest.fn(),
+      state: 'running',
+      close: jest.fn(),
+    }));
+
     Object.defineProperty(window, 'AudioContext', {
-      value: jest.fn().mockImplementation(() => ({
-        createAnalyser: jest.fn(),
-        createMediaStreamSource: jest.fn(),
-        createScriptProcessor: jest.fn(),
-      })),
+      value: mockAudioContext,
+      writable: true,
+    });
+
+    // Mock de webkitAudioContext
+    Object.defineProperty(window, 'webkitAudioContext', {
+      value: mockAudioContext,
       writable: true,
     });
 
@@ -96,13 +106,13 @@ describe('useTuner Hook', () => {
     // Simular evento de nota detectada
     act(() => {
       const event = new CustomEvent('noteDetected', {
-        detail: { 
+        detail: {
           noteData: {
             name: 'A',
             frequency: 440,
             octave: 4,
-            cents: 0
-          }
+            cents: 0,
+          },
         },
       });
       window.dispatchEvent(event);
@@ -129,6 +139,18 @@ describe('useTuner Hook', () => {
   it('handles unsupported browser gracefully', () => {
     // Mock de navegador no soportado
     Object.defineProperty(window, 'AudioContext', {
+      value: undefined,
+      writable: true,
+    });
+
+    // Mock de webkitAudioContext también como undefined
+    Object.defineProperty(window, 'webkitAudioContext', {
+      value: undefined,
+      writable: true,
+    });
+
+    // Mock de mediaDevices como undefined
+    Object.defineProperty(navigator, 'mediaDevices', {
       value: undefined,
       writable: true,
     });

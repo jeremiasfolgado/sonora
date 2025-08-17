@@ -27,6 +27,7 @@ export function TunerUI() {
     confidence,
     isStable,
     toggleListening,
+    forceSupport,
   } = useTuner();
 
   const {
@@ -41,7 +42,7 @@ export function TunerUI() {
   const { getTargetFrequency, getAdjustedStringName } = useTunerUtils();
 
   if (!isSupported) {
-    return <BrowserNotSupported />;
+    return <BrowserNotSupported onForceSupport={forceSupport} />;
   }
 
   return (
