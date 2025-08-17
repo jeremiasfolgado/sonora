@@ -53,8 +53,20 @@ export function useTuner(): UseTunerReturn {
 
   useEffect(() => {
     const checkSupport = () => {
-      const isSupported =
-        AudioAnalyzer.isSupported() && AudioAnalyzer.isMediaDevicesSupported();
+      // Detección más permisiva para dispositivos móviles
+      const hasAudioContext = AudioAnalyzer.isSupported();
+      const hasMediaDevices = AudioAnalyzer.isMediaDevicesSupported();
+
+      // Detectar si es dispositivo móvil
+      const isMobile =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        );
+
+      // En móviles, solo necesitamos AudioContext
+      // En desktop, necesitamos ambos
+      const isSupported = hasAudioContext && (isMobile || hasMediaDevices);
+
       setState((prev) => ({ ...prev, isSupported }));
       return isSupported;
     };

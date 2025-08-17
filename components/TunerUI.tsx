@@ -4,15 +4,15 @@ import { useTuner } from '../lib/hooks/useTuner';
 import { useTuning } from '../lib/hooks/useTuning';
 import { useTunerUtils } from '../lib/hooks/useTunerUtils';
 import styles from './TunerUI.module.css';
-import { Needle } from './Needle';
-import { TunerHeader } from './TunerHeader';
-import { NoteDisplay } from './NoteDisplay';
-import { StringIndicator } from './StringIndicator';
-import { TuningControls } from './TuningControls';
-import { AdditionalInfo } from './AdditionalInfo';
-import { StringTestButtons } from './StringTestButtons';
-import { TunerFooter } from './TunerFooter';
-import { BrowserNotSupported } from './BrowserNotSupported';
+import { Needle } from './common/Needle';
+import { TunerHeader } from './tuner/TunerHeader';
+import { NoteDisplay } from './tuner/NoteDisplay';
+import { StringIndicator } from './tuner/StringIndicator';
+import { TuningControls } from './tuner/TuningControls';
+import { AdditionalInfo } from './tuner/AdditionalInfo';
+import { StringTestButtons } from './tuner/StringTestButtons';
+import { TunerFooter } from './layout/TunerFooter';
+import { BrowserNotSupported } from './tuner/BrowserNotSupported';
 
 export function TunerUI() {
   const {
