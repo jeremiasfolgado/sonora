@@ -1,22 +1,13 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import {
-  Mic,
-  MicOff,
-  ChevronUp,
-  ChevronDown,
-  RotateCcw,
-  Info,
-  AlertCircle,
-} from 'lucide-react';
-import styles from './TunerUI.module.css';
+import { useEffect } from 'react';
 import { useTuner } from '../lib/hooks/useTuner';
 import { useTuning } from '../lib/hooks/useTuning';
 import {
-  getGuitarStringFrequency,
   getAdjustedGuitarStrings,
+  getGuitarStringFrequency,
 } from '../lib/audio/notes';
+import styles from './TunerUI.module.css';
 import { Needle } from './Needle';
 
 export function TunerUI() {
@@ -44,21 +35,35 @@ export function TunerUI() {
 
   // Debug: Log cuando cambien los valores del hook
   useEffect(() => {
-    console.log('🎵 TunerUI - Valores del hook actualizados:', {
-      customSemitones,
-      totalSemitones,
-      displayName: getTuningDisplayName(),
-    });
+    // Los valores del hook se actualizan correctamente
   }, [customSemitones, totalSemitones, getTuningDisplayName]);
 
   // Función para obtener la frecuencia objetivo de una cuerda (ajustada por afinación)
-  const getTargetFrequency = (stringName: string): number => {
-    if (!stringName || stringName === '--') {
+  const getTargetFrequency = (): number => {
+    if (!currentNote || !currentNote.name || currentNote.name === '--') {
       return 0;
     }
 
-    const freq = getGuitarStringFrequency(stringName);
-    return freq;
+    // Obtener la cuerda más cercana a la frecuencia detectada
+    const adjustedStrings = getAdjustedGuitarStrings();
+
+    // Buscar la cuerda más cercana en las cuerdas ajustadas
+    let closestString = '';
+    let minDifference = Infinity;
+
+    Object.entries(adjustedStrings).forEach(([stringName, stringInfo]) => {
+      const difference = Math.abs(stringInfo.frequency - currentNote.frequency);
+      if (difference < minDifference) {
+        minDifference = difference;
+        closestString = stringName;
+      }
+    });
+
+    if (closestString && adjustedStrings[closestString]) {
+      return adjustedStrings[closestString].frequency;
+    }
+
+    return 0;
   };
 
   // Función para obtener el nombre ajustado de una cuerda según la afinación
@@ -72,21 +77,16 @@ export function TunerUI() {
     const loadAubio = async () => {
       // Verificar si ya está cargado
       if ((window as { aubio?: () => Promise<unknown> }).aubio) {
-        console.log('🎵 Aubio.js ya está cargado');
         return;
       }
 
       try {
-        console.log('🎵 Cargando Aubio.js...');
-
         const script = document.createElement('script');
         script.src =
           'https://cdn.jsdelivr.net/npm/aubiojs@0.1.1/build/aubio.min.js';
         script.async = true;
 
-        script.onload = () => {
-          console.log('🎵 Aubio.js cargado correctamente');
-        };
+        script.onload = () => {};
 
         script.onerror = () => {
           console.error('❌ Error cargando Aubio.js');
@@ -103,60 +103,6 @@ export function TunerUI() {
       loadAubio();
     }
   }, []);
-
-  // Función para probar la detección con un tono de referencia
-  const testToneDetection = () => {
-    if (!isSupported) return;
-
-    try {
-      // Crear contexto de audio temporal
-      const audioContext = new (window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext })
-          .webkitAudioContext)();
-
-      // Crear oscilador para generar tono A4 (440 Hz) ajustado por afinación
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-
-      // Configurar oscilador con frecuencia ajustada
-      const adjustedFrequency = getGuitarStringFrequency(
-        getTuningDisplayName()
-      );
-      oscillator.frequency.setValueAtTime(
-        adjustedFrequency,
-        audioContext.currentTime
-      );
-      oscillator.type = 'sine';
-
-      // Configurar ganancia (volumen)
-      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime); // Bajo volumen
-      gainNode.gain.exponentialRampToValueAtTime(
-        0.01,
-        audioContext.currentTime + 2
-      );
-
-      // Conectar nodos
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      // Iniciar y detener oscilador
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 2);
-
-      console.log(
-        `🎵 Tono de prueba A4 ajustado (${adjustedFrequency.toFixed(
-          1
-        )} Hz) generado`
-      );
-
-      // Limpiar después de 2 segundos
-      setTimeout(() => {
-        audioContext.close();
-      }, 2500);
-    } catch (error) {
-      console.error('Error generando tono de prueba:', error);
-    }
-  };
 
   // Función para generar tonos de cuerdas de guitarra específicas
   const testGuitarString = (stringName: string) => {
@@ -191,12 +137,6 @@ export function TunerUI() {
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 3);
 
-      console.log(
-        `🎸 Tono de prueba ${stringName} ajustado (${adjustedFrequency.toFixed(
-          1
-        )} Hz) generado`
-      );
-
       setTimeout(() => {
         audioContext.close();
       }, 3500);
@@ -208,7 +148,7 @@ export function TunerUI() {
   if (!isSupported) {
     return (
       <div className={styles.errorContainer}>
-        <AlertCircle size={48} color="var(--error-color)" />
+        <div className={styles.errorIcon}>⚠️</div>
         <h2>Navegador no compatible</h2>
         <p>
           Tu navegador no soporta Web Audio API o acceso al micrófono. Por
@@ -221,7 +161,7 @@ export function TunerUI() {
   if (!isSupported) {
     return (
       <div className={styles.errorContainer}>
-        <AlertCircle size={48} color="var(--error-color)" />
+        <div className={styles.errorIcon}>⚠️</div>
         <h2>Navegador no compatible</h2>
         <p>
           Tu navegador no soporta Web Audio API o acceso al micrófono. Por
@@ -234,7 +174,7 @@ export function TunerUI() {
   if (!isSupported) {
     return (
       <div className={styles.errorContainer}>
-        <AlertCircle size={48} color="var(--error-color)" />
+        <div className={styles.errorIcon}>⚠️</div>
         <h2>Navegador no compatible</h2>
         <p>
           Tu navegador no soporta Web Audio API o acceso al micrófono. Por
@@ -292,32 +232,13 @@ export function TunerUI() {
         {/* Controles principales */}
         <div className={styles.controls}>
           <button
+            onClick={toggleListening}
             className={`${styles.toggleButton} ${
               isListening ? styles.listening : ''
             }`}
-            onClick={toggleListening}
             disabled={!isSupported}
           >
-            {isListening ? (
-              <>
-                <MicOff size={20} />
-                <span>Detener</span>
-              </>
-            ) : (
-              <>
-                <Mic size={20} />
-                <span>Iniciar</span>
-              </>
-            )}
-          </button>
-
-          {/* Botón de prueba compacto */}
-          <button
-            className={styles.testButton}
-            onClick={() => testToneDetection()}
-            disabled={!isSupported}
-          >
-            🎵 Probar
+            {isListening ? 'Detener' : 'Iniciar'}
           </button>
         </div>
 
@@ -336,30 +257,29 @@ export function TunerUI() {
 
           <div className={styles.tuningButtons}>
             <button
-              className={styles.tuningButton}
               onClick={decreaseSemitone}
-              title="Bajar semitono"
+              className={styles.tuningButton}
+              disabled={customSemitones <= -12}
             >
-              <ChevronDown size={20} />
-              Bajar
+              <span>Bajar</span>
+              <span>▼</span>
             </button>
 
             <button
-              className={styles.tuningButton}
               onClick={resetTuning}
-              title="Resetear afinación"
+              className={styles.resetSemitoneButton}
             >
-              <RotateCcw size={20} />
-              Reset
+              <span>Reset</span>
+              <span>↺</span>
             </button>
 
             <button
-              className={styles.tuningButton}
               onClick={increaseSemitone}
-              title="Subir semitono"
+              className={styles.tuningButton}
+              disabled={customSemitones >= 12}
             >
-              <ChevronUp size={20} />
-              Subir
+              <span>Subir</span>
+              <span>▲</span>
             </button>
           </div>
         </div>
@@ -388,7 +308,6 @@ export function TunerUI() {
               </div>
 
               <div className={styles.stringInfo}>
-                <Info size={14} />
                 <span>
                   <strong>Objetivo:</strong>{' '}
                   {(() => {
@@ -400,9 +319,7 @@ export function TunerUI() {
                       return '0.0 Hz';
                     }
 
-                    const targetFreq = getTargetFrequency(
-                      getTuningDisplayName()
-                    );
+                    const targetFreq = getTargetFrequency();
                     return `${targetFreq.toFixed(1)} Hz`;
                   })()}
                 </span>
@@ -420,7 +337,6 @@ export function TunerUI() {
         {/* Mensaje de error */}
         {error && (
           <div className={styles.errorMessage}>
-            <AlertCircle size={16} />
             <span>{error}</span>
           </div>
         )}
@@ -488,7 +404,9 @@ export function TunerUI() {
 
       {/* Footer compacto */}
       <div className={styles.footer}>
-        <p>Sonora - Herramientas Musicales</p>
+        <p>
+          Sonora - Desarrollador por Jeremías Folgado con un poco bastante de IA
+        </p>
       </div>
     </div>
   );

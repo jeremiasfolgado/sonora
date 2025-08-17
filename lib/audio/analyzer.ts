@@ -1,5 +1,5 @@
 import type { Note } from './notes';
-import { frequencyToNote, getTuningOffset, getFullNoteName } from './notes';
+import { frequencyToNote } from './notes';
 
 export interface AudioAnalysisResult {
   frequency: number;
@@ -30,18 +30,26 @@ export class AudioAnalyzer {
    */
   private async initAubio(): Promise<void> {
     try {
-      // @ts-expect-error - Aubio es una librería externa
-      const aubio = await (window as { aubio: () => Promise<unknown> }).aubio();
-      // @ts-expect-error - Aubio crea un detector de pitch
+      const aubio = await (
+        window as unknown as {
+          aubio: () => Promise<{
+            Pitch: new (
+              mode: string,
+              bufferSize: number,
+              channels: number,
+              sampleRate: number
+            ) => unknown;
+          }>;
+        }
+      ).aubio();
       this.pitchDetector = new aubio.Pitch(
         'default',
         this.BUFFER_SIZE,
         1,
         this.SAMPLE_RATE
       );
-      console.log('🎵 Aubio inicializado correctamente');
-    } catch (error) {
-      console.error('Error inicializando Aubio:', error);
+    } catch {
+      throw new Error('Failed to initialize Aubio');
     }
   }
 
@@ -68,7 +76,7 @@ export class AudioAnalyzer {
       }
 
       if (permission.state === 'prompt') {
-        console.log('🎤 Solicitando permiso del micrófono...');
+        // Solicitando permiso del micrófono...
       }
 
       // Crear contexto de audio
@@ -87,7 +95,6 @@ export class AudioAnalyzer {
             channelCount: 1,
           },
         });
-        console.log('🎤 Permiso del micrófono concedido');
       } catch (mediaError) {
         if (mediaError instanceof DOMException) {
           switch (mediaError.name) {
@@ -147,7 +154,6 @@ export class AudioAnalyzer {
       });
 
       this.isListening = true;
-      console.log('🎤 Audio capturado iniciado con Aubio');
     } catch (error) {
       console.error('Error starting audio capture:', error);
       const errorMessage =
@@ -178,19 +184,6 @@ export class AudioAnalyzer {
       if (frequency && frequency > 0) {
         // Usar el sistema de notas de notes.ts para obtener la información completa
         const note = frequencyToNote(frequency);
-
-        // Obtener el offset de afinación actual
-        const tuningOffset = getTuningOffset();
-        const offsetText =
-          tuningOffset !== 0
-            ? ` (${tuningOffset > 0 ? '+' : ''}${tuningOffset} semitones)`
-            : '';
-
-        console.log(
-          `🎵 Nota detectada: ${getFullNoteName(note)} (${frequency.toFixed(
-            1
-          )} Hz) - ${note.cents} cents${offsetText}`
-        );
 
         // Emitir evento con la nota detectada usando la estructura completa de Note
         this.onNoteDetected(note);
@@ -261,7 +254,6 @@ export class AudioAnalyzer {
     }
 
     this.isListening = false;
-    console.log('🎤 Audio capturado detenido');
   }
 
   /**

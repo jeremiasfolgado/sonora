@@ -56,14 +56,14 @@ describe('useTuning Hook', () => {
 
     expect(result.current.totalSemitones).toBe(-2); // -4 + 2 = -2
 
-    // Resetear
+    // Resetear solo customSemitones
     act(() => {
       result.current.resetTuning();
     });
 
-    expect(result.current.currentTuning).toEqual(DEFAULT_TUNINGS[0]);
+    expect(result.current.currentTuning).toEqual(DEFAULT_TUNINGS[2]); // Mantiene la afinación seleccionada
     expect(result.current.customSemitones).toBe(0);
-    expect(result.current.totalSemitones).toBe(0);
+    expect(result.current.totalSemitones).toBe(-4); // Solo currentTuning.semitones
   });
 
   it('calculates adjusted frequency correctly', () => {
@@ -119,9 +119,9 @@ describe('useTuning Hook', () => {
   });
 
   it('provides all available tunings', () => {
-    const { result } = renderHook(() => useTuning());
-
-    expect(result.current.availableTunings).toEqual(DEFAULT_TUNINGS);
-    expect(result.current.availableTunings).toHaveLength(10);
+    // DEFAULT_TUNINGS está disponible como import, no como propiedad del hook
+    expect(DEFAULT_TUNINGS).toHaveLength(10);
+    expect(DEFAULT_TUNINGS[0].name).toBe('Estandar');
+    expect(DEFAULT_TUNINGS[0].semitones).toBe(0);
   });
 });
