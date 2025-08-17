@@ -172,7 +172,7 @@ export function frequencyToNote(frequency: number): Note {
 
   // Para un afinador de guitarra, calcular cents contra la cuerda más cercana
   const closestString = getClosestGuitarString(frequency);
-  
+
   if (closestString === '--') {
     // Si no hay cuerda cercana, usar el cálculo estándar
     const ratio = frequency / A4_FREQUENCY.toNumber();
@@ -203,7 +203,7 @@ export function frequencyToNote(frequency: number): Note {
   // Calcular cents contra la cuerda de guitarra más cercana
   const adjustedStrings = getAdjustedGuitarStrings();
   const stringInfo = adjustedStrings[closestString];
-  
+
   if (!stringInfo) {
     // Fallback si no se encuentra la información de la cuerda
     return {
@@ -218,13 +218,13 @@ export function frequencyToNote(frequency: number): Note {
   // Calcular cents contra la frecuencia de la cuerda ajustada
   const targetFrequency = stringInfo.frequency;
   const cents = calculateCents(frequency, targetFrequency);
-  
+
   // Extraer el nombre de la nota completo (incluyendo # si existe)
   let noteName = stringInfo.name.charAt(0);
   if (stringInfo.name.length > 1 && stringInfo.name.charAt(1) === '#') {
     noteName = stringInfo.name.substring(0, 2); // "D#"
   }
-  
+
   // Extraer la octave (asumiendo que está al final)
   const octaveMatch = stringInfo.name.match(/\d+$/);
   const octave = octaveMatch ? parseInt(octaveMatch[0]) : 0;

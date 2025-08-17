@@ -51,7 +51,6 @@ export function useTuner(): UseTunerReturn {
   const analyzerRef = useRef<AudioAnalyzer | null>(null);
   const isInitializedRef = useRef(false);
 
-  // Verificar soporte solo en el cliente
   useEffect(() => {
     const checkSupport = () => {
       const isSupported =

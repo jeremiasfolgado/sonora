@@ -74,10 +74,21 @@ export function useTuning() {
     setTuningOffset(totalSemitones);
   }, [currentTuning.semitones, customSemitones]);
 
-  const changeTuning = useCallback((tuning: TuningConfig) => {
-    setCurrentTuning(tuning);
-    setCustomSemitones(0);
-  }, []);
+  const getTuningDisplayName = useCallback(() => {
+    if (customSemitones === 0) {
+      return currentTuning.name;
+    }
+    const sign = customSemitones > 0 ? '+' : '';
+    return `${currentTuning.name} ${sign}${customSemitones} semitones`;
+  }, [currentTuning.name, customSemitones]);
+
+  const getAdjustedFrequency = useCallback(
+    (baseFrequency: number) => {
+      const totalSemitones = currentTuning.semitones + customSemitones;
+      return baseFrequency * Math.pow(2, totalSemitones / 12);
+    },
+    [currentTuning.semitones, customSemitones]
+  );
 
   const increaseSemitone = useCallback(() => {
     setCustomSemitones((prev) => prev + 1);
@@ -88,40 +99,23 @@ export function useTuning() {
   }, []);
 
   const resetTuning = useCallback(() => {
-    setCurrentTuning(DEFAULT_TUNINGS[0]);
     setCustomSemitones(0);
   }, []);
 
-  const getTotalSemitones = useCallback(() => {
-    return currentTuning.semitones + customSemitones;
-  }, [currentTuning.semitones, customSemitones]);
-
-  const getAdjustedFrequency = useCallback(
-    (baseFrequency: number) => {
-      const totalSemitones = getTotalSemitones();
-      return baseFrequency * Math.pow(2, totalSemitones / 12);
-    },
-    [getTotalSemitones]
-  );
-
-  const getTuningDisplayName = useCallback(() => {
-    if (customSemitones === 0) {
-      return currentTuning.name;
-    }
-    const sign = customSemitones > 0 ? '+' : '';
-    return `${currentTuning.name} ${sign}${customSemitones} semitones`;
-  }, [currentTuning.name, customSemitones]);
+  const changeTuning = useCallback((tuning: TuningConfig) => {
+    setCurrentTuning(tuning);
+    setCustomSemitones(0);
+  }, []);
 
   return {
     currentTuning,
     customSemitones,
-    totalSemitones: getTotalSemitones(),
-    changeTuning,
+    totalSemitones: currentTuning.semitones + customSemitones,
+    getTuningDisplayName,
+    getAdjustedFrequency,
     increaseSemitone,
     decreaseSemitone,
     resetTuning,
-    getAdjustedFrequency,
-    getTuningDisplayName,
-    availableTunings: DEFAULT_TUNINGS,
+    changeTuning,
   };
 }
