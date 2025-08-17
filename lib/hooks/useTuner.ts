@@ -82,7 +82,7 @@ export function useTuner(): UseTunerReturn {
 
         setState((prev) => ({ ...prev, isSupported }));
         return isSupported;
-      } catch (error) {
+      } catch {
         setState((prev) => ({ ...prev, isSupported: false }));
         return false;
       }
@@ -129,7 +129,7 @@ export function useTuner(): UseTunerReturn {
 
         analyzerRef.current = new AudioAnalyzer();
         isInitializedRef.current = true;
-      } catch (error) {
+      } catch {
         setState((prev) => ({
           ...prev,
           error: 'Failed to initialize audio analyzer',
