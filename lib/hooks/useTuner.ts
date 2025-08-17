@@ -91,7 +91,6 @@ export function useTuner(): UseTunerReturn {
 
         analyzerRef.current = new AudioAnalyzer();
         isInitializedRef.current = true;
-        console.log('🎵 Analizador de audio inicializado correctamente');
       } catch (error) {
         console.error('Error inicializando analizador:', error);
         setState((prev) => ({
@@ -113,22 +112,16 @@ export function useTuner(): UseTunerReturn {
       const { noteData } = event.detail;
 
       if (noteData && noteData.frequency > 0) {
-        // Convertir la nota de Aubio a nuestro formato
-        const note: Note = {
-          name: noteData.name,
-          frequency: noteData.frequency,
-          octave: noteData.octave,
-          cents: noteData.cents,
-          confidence: 0.9, // Aubio es muy confiable
-        };
+        // El analizador ahora envía directamente el objeto Note completo
+        const note: Note = noteData;
 
         const tuningStatus = getTuningStatus(note.cents);
         const tuningColor = getTuningColor(tuningStatus);
-        const closestString = getClosestGuitarString(noteData.frequency);
+        const closestString = getClosestGuitarString(note.frequency);
 
         setState((prev) => ({
           ...prev,
-          currentFrequency: noteData.frequency,
+          currentFrequency: note.frequency,
           currentNote: note,
           tuningStatus,
           tuningColor,

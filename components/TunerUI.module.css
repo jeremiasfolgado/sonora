@@ -1,396 +1,386 @@
 .tunerContainer {
+  max-width: 100%;
   min-height: 100vh;
-  height: 100vh;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 1rem;
-  background: linear-gradient(
-    135deg,
-    var(--bg-primary) 0%,
-    var(--bg-secondary) 50%,
-    var(--bg-tertiary) 100%
-  );
-  overflow: hidden;
-  gap: 0.5rem;
+  gap: 1rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .header {
   text-align: center;
-  margin-bottom: 0.5rem;
-  flex-shrink: 0;
-  z-index: 10;
+  margin-bottom: 1rem;
 }
 
 .title {
   font-size: 2rem;
   font-weight: 700;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--accent-color)
-  );
+  margin: 0;
+  background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 0.25rem;
-  text-shadow: 0 0 20px rgba(79, 70, 229, 0.3);
 }
 
 .subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0 0 0;
+  font-weight: 400;
+}
+
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+  flex: 1;
+}
+
+.noteDisplay {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.noteName {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  text-shadow: 0 0 20px var(--accent-color);
+  margin: 0;
+  line-height: 1;
+}
+
+.frequency {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.stringIndicator {
+  background: var(--bg-secondary);
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+}
+
+.stringLabel {
   font-size: 0.9rem;
   color: var(--text-secondary);
   font-weight: 500;
 }
 
-.mainContent {
-  flex: 1;
+.stringName {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.stringNumber {
+  background: var(--accent-color);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.controls {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+.toggleButton {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 120px;
+  justify-content: center;
+}
+
+.toggleButton:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.toggleButton.listening {
+  background: var(--error-color);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.settingsButton {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.settingsButton:hover {
+  background: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+  transform: translateY(-1px);
+}
+
+.testButton {
+  background: var(--success-color);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+.testButton:hover {
+  background: var(--success-hover);
+  transform: translateY(-1px);
+}
+
+/* Controles de semitonos */
+.semitoneControls {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.semitoneHeader {
+  margin-bottom: 1rem;
+}
+
+.semitoneLabel {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.semitoneIndicator {
+  background: var(--accent-color);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+
+.semitoneButtons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.semitoneButton {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  width: 100%;
-  max-width: 600px;
-  min-height: 0;
-  padding: 0.5rem 0;
-  overflow: hidden;
-}
-
-.noteDisplay {
-  text-align: center;
-  margin-bottom: 0.5rem;
-}
-
-.noteName {
-  font-size: 5rem;
-  font-weight: 900;
-  color: var(--text-primary);
-  text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
-  margin-bottom: 0.25rem;
-  font-family: 'Courier New', monospace;
-  letter-spacing: 0.1em;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--accent-color)
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: none;
-}
-
-.frequency {
-  font-size: 1.25rem;
-  color: var(--text-secondary);
+  gap: 0.5rem;
+  min-width: 80px;
+  font-size: 0.8rem;
   font-weight: 500;
-  font-family: 'Courier New', monospace;
-  margin-bottom: 0.5rem;
+}
+
+.semitoneButton:hover {
+  background: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+  transform: translateY(-1px);
+}
+
+.resetSemitoneButton {
+  background: var(--warning-color);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 80px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.resetSemitoneButton:hover {
+  background: var(--warning-hover);
+  transform: translateY(-1px);
 }
 
 .additionalInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-items: center;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  width: 100%;
   max-width: 400px;
-  flex-shrink: 0;
-  margin: 0.5rem 0;
-  z-index: 5;
 }
 
 .infoRow {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  align-items: center;
-  width: 100%;
-}
-
-.stringIndicator {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--accent-color)
-  );
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  color: white;
-  font-weight: 600;
-  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
-  min-width: 180px;
-  justify-content: center;
-  flex-shrink: 0;
-  margin: 0.5rem 0;
-  z-index: 5;
-}
-
-.stringLabel {
-  font-size: 0.8rem;
-  opacity: 0.9;
-}
-
-.stringName {
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-}
-
-.stringNumber {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 0.2rem 0.4rem;
-  border-radius: 10px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  min-width: 25px;
-  text-align: center;
+  gap: 1rem;
 }
 
 .confidenceBar {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
+  gap: 0.75rem;
+  font-size: 0.9rem;
 }
 
 .confidenceMeter {
-  width: 80px;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
+  flex: 1;
+  height: 8px;
+  background: var(--bg-primary);
+  border-radius: 4px;
   overflow: hidden;
-  position: relative;
+  border: 1px solid var(--border-color);
 }
 
 .confidenceFill {
   height: 100%;
-  transition: width 0.3s ease, background-color 0.3s ease;
-  border-radius: 3px;
+  transition: width 0.3s ease;
+  border-radius: 4px;
 }
 
 .stringInfo {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.8rem;
+  gap: 0.5rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.4rem 0.8rem;
-  border-radius: 15px;
-}
-
-.stringInfo strong {
-  color: var(--text-primary);
 }
 
 .stabilityWarning {
-  font-size: 0.75rem;
+  text-align: center;
   color: var(--warning-color);
-  font-style: italic;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.controls {
-  display: flex;
-  justify-content: center;
-  gap: 0.75rem;
-  margin: 1rem 0;
-  flex-wrap: wrap;
-  flex-shrink: 0;
-  z-index: 5;
-  width: 100%;
-  max-width: 400px;
-}
-
-.toggleButton {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--secondary-color)
-  );
-  color: white;
-  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
-  flex-shrink: 0;
-}
-
-.toggleButton:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
-}
-
-.toggleButton:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.toggleButton.listening {
-  background: linear-gradient(135deg, var(--error-color), #dc2626);
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-}
-
-.toggleButton.listening:hover:not(:disabled) {
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
-}
-
-.toggleButton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.testButton {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.75rem 1.25rem;
   font-size: 0.9rem;
   font-weight: 500;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: linear-gradient(
-    135deg,
-    var(--accent-color),
-    var(--secondary-color)
-  );
-  color: white;
-  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
-  flex-shrink: 0;
-}
-
-.testButton:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
-}
-
-.testButton:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.testButton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.stringTestButtons {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 1rem 0;
-  max-width: 800px;
-  flex-shrink: 0;
-  z-index: 5;
-  width: 100%;
-}
-
-.testLabel {
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  font-weight: 500;
-  margin: 0;
-  text-align: center;
-}
-
-.stringButtons {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 0.5rem;
-  width: 100%;
-  max-width: 600px;
-}
-
-.stringButton {
-  padding: 0.5rem 0.4rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  flex-shrink: 0;
-  min-height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  line-height: 1.2;
-}
-
-.stringButton:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: var(--accent-color);
-  transform: translateY(-1px);
-}
-
-.stringButton:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.stringButton:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+  padding: 0.5rem;
+  background: rgba(255, 193, 7, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 193, 7, 0.3);
 }
 
 .errorMessage {
+  background: rgba(220, 53, 69, 0.1);
+  color: var(--error-color);
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(220, 53, 69, 0.3);
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.75rem;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid var(--error-color);
-  border-radius: 8px;
-  color: var(--error-color);
-  font-weight: 500;
+  gap: 0.5rem;
+  font-size: 0.9rem;
   max-width: 400px;
-  text-align: center;
-  font-size: 0.8rem;
-  flex-shrink: 0;
-  margin: 0.5rem 0;
-  z-index: 5;
 }
 
 .instructions {
   text-align: center;
   color: var(--text-secondary);
   max-width: 400px;
-  flex-shrink: 0;
-  margin: 0.5rem 0;
-  z-index: 5;
 }
 
 .instructions p {
-  margin-bottom: 0.5rem;
+  margin: 0 0 0.75rem 0;
   font-size: 0.9rem;
 }
 
 .quickTips {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.5rem;
   font-size: 0.8rem;
-  opacity: 0.8;
-  font-style: italic;
+}
+
+.stringTestButtons {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.testLabel {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem 0;
+  font-weight: 500;
+}
+
+.stringButtons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.5rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.stringButton {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.stringButton:hover {
+  background: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
 }
 
 .footer {
@@ -398,94 +388,81 @@
   color: var(--text-secondary);
   font-size: 0.8rem;
   margin-top: auto;
-  flex-shrink: 0;
-  z-index: 5;
-  padding: 0.5rem 0;
+  padding: 1rem 0;
 }
 
-.errorContainer {
-  min-height: 100vh;
+/* Modal styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  padding: 2rem;
-  gap: 1.5rem;
+  z-index: 1000;
+  padding: 1rem;
 }
 
-.errorContainer h2 {
-  color: var(--error-color);
-  font-size: 1.5rem;
+.modal {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 1.25rem;
   font-weight: 600;
-}
-
-.errorContainer p {
-  color: var(--text-secondary);
-  max-width: 500px;
-  line-height: 1.6;
-}
-
-.loadingContainer {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 2rem;
-  gap: 1.5rem;
-}
-
-.loadingContainer h2 {
   color: var(--text-primary);
-  font-size: 1.5rem;
-  font-weight: 600;
 }
 
-.loadingContainer p {
-  color: var(--text-secondary);
-  max-width: 500px;
-  line-height: 1.6;
-}
-
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(255, 255, 255, 0.1);
-  border-left-color: var(--accent-color);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.retryButton {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 500;
+.closeButton {
+  background: none;
   border: none;
-  border-radius: 8px;
+  font-size: 1.5rem;
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.3s ease;
-  background: var(--accent-color);
-  color: white;
-  margin-top: 1rem;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.retryButton:hover {
-  background: var(--secondary-color);
-  transform: translateY(-1px);
+.closeButton:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.modalContent {
+  padding: 1rem 1.5rem 1.5rem 1.5rem;
+  overflow-y: auto;
+  max-height: 70vh;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .tunerContainer {
     padding: 0.75rem;
+    gap: 0.75rem;
   }
 
   .title {
@@ -493,115 +470,100 @@
   }
 
   .subtitle {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
   }
 
   .noteName {
-    font-size: 4rem;
+    font-size: 2.5rem;
   }
 
   .frequency {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
-  .mainContent {
-    gap: 1.25rem;
+  .controls {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
   }
 
-  .toggleButton {
-    padding: 0.7rem 1.4rem;
-    font-size: 0.9rem;
+  .toggleButton,
+  .settingsButton,
+  .testButton {
+    width: 100%;
+    max-width: 280px;
   }
 
-  .additionalInfo {
-    gap: 0.4rem;
+  .semitoneButtons {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
-  .confidenceBar {
-    font-size: 0.75rem;
-  }
-
-  .confidenceMeter {
-    width: 70px;
-  }
-
-  .stringInfo {
-    font-size: 0.75rem;
-    padding: 0.35rem 0.7rem;
-  }
-
-  .stringIndicator {
-    min-width: 160px;
-    padding: 0.45rem 0.9rem;
-  }
-
-  .stringName {
-    font-size: 0.9rem;
+  .semitoneButton,
+  .resetSemitoneButton {
+    width: 100%;
+    max-width: 200px;
+    flex-direction: row;
+    justify-content: center;
   }
 
   .stringButtons {
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.4rem;
-    max-width: 500px;
+    gap: 0.25rem;
   }
 
   .stringButton {
-    padding: 0.45rem 0.35rem;
-    font-size: 0.7rem;
-    min-height: 35px;
+    font-size: 0.75rem;
+    padding: 0.4rem;
+  }
+
+  .modal {
+    max-width: 95vw;
+    max-height: 95vh;
+  }
+
+  .modalHeader {
+    padding: 1rem 1rem 0.75rem 1rem;
+  }
+
+  .modalContent {
+    padding: 0.75rem 1rem 1rem 1rem;
   }
 }
 
 @media (max-width: 480px) {
-  .tunerContainer {
-    padding: 0.5rem;
-  }
-
-  .title {
-    font-size: 1.5rem;
-  }
-
   .noteName {
-    font-size: 3.5rem;
-  }
-
-  .toggleButton {
-    padding: 0.65rem 1.3rem;
-    font-size: 0.85rem;
-  }
-
-  .noteDisplay {
-    margin-bottom: 0.4rem;
-  }
-
-  .additionalInfo {
-    gap: 0.35rem;
+    font-size: 2rem;
   }
 
   .stringIndicator {
-    min-width: 140px;
-    padding: 0.4rem 0.8rem;
+    padding: 0.5rem 1rem;
     flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .stringName {
-    font-size: 0.8rem;
+    gap: 0.5rem;
+    text-align: center;
   }
 
   .stringButtons {
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.3rem;
-    max-width: 400px;
   }
 
-  .stringButton {
-    padding: 0.4rem 0.3rem;
-    font-size: 0.65rem;
-    min-height: 32px;
+  .semitoneControls {
+    padding: 0.75rem;
   }
 
-  .mainContent {
-    gap: 1rem;
+  .semitoneButton,
+  .resetSemitoneButton {
+    font-size: 0.75rem;
+    padding: 0.6rem 0.8rem;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
   }
 }

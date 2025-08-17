@@ -1,4 +1,5 @@
 import type { Note } from './notes';
+import { frequencyToNote, getTuningOffset, getFullNoteName } from './notes';
 
 export interface AudioAnalysisResult {
   frequency: number;
@@ -18,24 +19,6 @@ export class AudioAnalyzer {
   // Configuración optimizada basada en el proyecto que funciona
   private readonly BUFFER_SIZE = 4096;
   private readonly SAMPLE_RATE = 44100;
-  private readonly MIDDLE_A = 440; // A4
-  private readonly SEMITONE = 69; // MIDI note para A4
-
-  // Notas musicales
-  private readonly noteStrings = [
-    'C',
-    'C♯',
-    'D',
-    'D♯',
-    'E',
-    'F',
-    'F♯',
-    'G',
-    'G♯',
-    'A',
-    'A♯',
-    'B',
-  ];
 
   constructor() {
     // Inicializar Aubio cuando esté disponible
@@ -179,7 +162,9 @@ export class AudioAnalyzer {
    * Procesa el audio en tiempo real
    */
   private processAudio(event: AudioProcessingEvent): void {
-    if (!this.isListening || !this.pitchDetector) return;
+    if (!this.isListening || !this.pitchDetector) {
+      return;
+    }
 
     try {
       // Obtener datos de audio del canal 0 (mono)
@@ -191,67 +176,52 @@ export class AudioAnalyzer {
       ).do(inputBuffer);
 
       if (frequency && frequency > 0) {
-        // Obtener información de la nota
-        const note = this.getNote(frequency);
-        const noteData = {
-          name: this.noteStrings[note % 12],
-          value: note,
-          cents: this.getCents(frequency, note),
-          octave: Math.floor(note / 12) - 1,
-          frequency: frequency,
-        };
+        // Usar el sistema de notas de notes.ts para obtener la información completa
+        const note = frequencyToNote(frequency);
+
+        // Obtener el offset de afinación actual
+        const tuningOffset = getTuningOffset();
+        const offsetText =
+          tuningOffset !== 0
+            ? ` (${tuningOffset > 0 ? '+' : ''}${tuningOffset} semitones)`
+            : '';
 
         console.log(
-          `🎵 Nota detectada: ${noteData.name}${
-            noteData.octave
-          } (${frequency.toFixed(1)} Hz) - ${noteData.cents} cents`
+          `🎵 Nota detectada: ${getFullNoteName(note)} (${frequency.toFixed(
+            1
+          )} Hz) - ${note.cents} cents${offsetText}`
         );
 
-        // Emitir evento con la nota detectada
-        this.onNoteDetected(noteData);
+        // Emitir evento con la nota detectada usando la estructura completa de Note
+        this.onNoteDetected(note);
       }
     } catch (error) {
       console.error('Error procesando audio:', error);
     }
   }
 
-  /**
-   * Obtiene la nota MIDI desde la frecuencia
-   */
-  private getNote(frequency: number): number {
-    const note = 12 * (Math.log(frequency / this.MIDDLE_A) / Math.log(2));
-    return Math.round(note) + this.SEMITONE;
-  }
-
-  /**
-   * Obtiene la frecuencia estándar de una nota
-   */
-  private getStandardFrequency(note: number): number {
-    return this.MIDDLE_A * Math.pow(2, (note - this.SEMITONE) / 12);
-  }
-
-  /**
-   * Calcula la diferencia en cents entre la frecuencia dada y la frecuencia estándar
-   */
-  private getCents(frequency: number, note: number): number {
-    return Math.floor(
-      (1200 * Math.log(frequency / this.getStandardFrequency(note))) /
-        Math.log(2)
-    );
-  }
+  // Notas musicales para compatibilidad
+  private readonly noteStrings = [
+    'C',
+    'C♯',
+    'D',
+    'D♯',
+    'E',
+    'F',
+    'F♯',
+    'G',
+    'G♯',
+    'A',
+    'A♯',
+    'B',
+  ];
 
   /**
    * Callback cuando se detecta una nota
    */
-  private onNoteDetected(noteData: {
-    name: string;
-    value: number;
-    cents: number;
-    octave: number;
-    frequency: number;
-  }): void {
+  private onNoteDetected(note: Note): void {
     const event = new CustomEvent('noteDetected', {
-      detail: { noteData },
+      detail: { noteData: note },
     });
     window.dispatchEvent(event);
   }

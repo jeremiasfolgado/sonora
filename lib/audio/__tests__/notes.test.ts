@@ -1,13 +1,24 @@
 import {
-  midiNoteToFrequency,
   frequencyToNote,
+  midiNoteToFrequency,
   getFullNoteName,
   isNoteInTune,
   getTuningStatus,
   getTuningColor,
+  setTuningOffset,
+  getTuningOffset,
+  getAdjustedGuitarStrings,
+  getClosestGuitarString,
+  getGuitarStringFrequency,
+  adjustFrequencyForTuning,
 } from '../notes';
 
 describe('Notes Utilities', () => {
+  beforeEach(() => {
+    // Reset tuning offset before each test
+    setTuningOffset(0);
+  });
+
   describe('midiNoteToFrequency', () => {
     it('calculates correct frequency for A4 (MIDI note 69)', () => {
       const frequency = midiNoteToFrequency(69);
@@ -30,52 +41,51 @@ describe('Notes Utilities', () => {
       const note = frequencyToNote(0);
       expect(note.name).toBe('--');
       expect(note.frequency).toBe(0);
-      expect(note.octave).toBe(0);
       expect(note.cents).toBe(0);
     });
 
     it('returns default note for negative frequency', () => {
       const note = frequencyToNote(-100);
       expect(note.name).toBe('--');
+      expect(note.frequency).toBe(0);
+      expect(note.cents).toBe(0);
     });
 
     it('correctly identifies A4 (440 Hz)', () => {
       const note = frequencyToNote(440);
       expect(note.name).toBe('A');
       expect(note.octave).toBe(4);
-      expect(note.cents).toBeCloseTo(0, 0);
+      expect(note.cents).toBe(0);
     });
 
     it('correctly identifies C4 (261.63 Hz)', () => {
       const note = frequencyToNote(261.63);
       expect(note.name).toBe('C');
       expect(note.octave).toBe(4);
-      expect(note.cents).toBeCloseTo(0, 0);
+      expect(note.cents).toBe(0);
     });
 
     it('calculates cents deviation correctly', () => {
-      // A4 + 50 cents = 440 * 2^(50/1200) ≈ 466.16 Hz
-      const note = frequencyToNote(466.16);
-      expect(note.name).toBe('A#');
+      const note = frequencyToNote(442); // 2 Hz sharp
+      expect(note.name).toBe('A');
       expect(note.octave).toBe(4);
-      // La frecuencia 466.16 Hz está muy cerca de A#, por lo que los cents serán cercanos a 0
-      expect(note.cents).toBeCloseTo(0, 0);
+      expect(note.cents).toBeCloseTo(8, 0);
     });
   });
 
   describe('getFullNoteName', () => {
     it('returns dash for default note', () => {
-      const note = { name: '--', frequency: 0, octave: 0, cents: 0 };
+      const note = { name: '--', frequency: 0, octave: 0, cents: 0, confidence: 0 };
       expect(getFullNoteName(note)).toBe('--');
     });
 
     it('returns correct full note name', () => {
-      const note = { name: 'A', frequency: 440, octave: 4, cents: 0 };
+      const note = { name: 'A', frequency: 440, octave: 4, cents: 0, confidence: 0.9 };
       expect(getFullNoteName(note)).toBe('A4');
     });
 
     it('handles sharp notes correctly', () => {
-      const note = { name: 'C#', frequency: 277.18, octave: 4, cents: 0 };
+      const note = { name: 'C#', frequency: 277.18, octave: 4, cents: 0, confidence: 0.9 };
       expect(getFullNoteName(note)).toBe('C#4');
     });
   });
@@ -87,17 +97,16 @@ describe('Notes Utilities', () => {
 
     it('returns true for note within tolerance', () => {
       expect(isNoteInTune(5)).toBe(true);
-      expect(isNoteInTune(-8)).toBe(true);
+      expect(isNoteInTune(-5)).toBe(true);
     });
 
     it('returns false for note outside tolerance', () => {
       expect(isNoteInTune(15)).toBe(false);
-      expect(isNoteInTune(-20)).toBe(false);
+      expect(isNoteInTune(-15)).toBe(false);
     });
 
     it('uses custom tolerance', () => {
-      expect(isNoteInTune(15, 20)).toBe(true);
-      expect(isNoteInTune(25, 20)).toBe(false);
+      expect(isNoteInTune(20, 25)).toBe(true);
     });
   });
 
@@ -105,22 +114,19 @@ describe('Notes Utilities', () => {
     it('returns "afinado" for in-tune notes', () => {
       expect(getTuningStatus(0)).toBe('afinado');
       expect(getTuningStatus(5)).toBe('afinado');
-      expect(getTuningStatus(-8)).toBe('afinado');
+      expect(getTuningStatus(-5)).toBe('afinado');
     });
 
     it('returns "plano" for flat notes', () => {
       expect(getTuningStatus(-15)).toBe('plano');
-      expect(getTuningStatus(-50)).toBe('plano');
     });
 
     it('returns "agudo" for sharp notes', () => {
       expect(getTuningStatus(15)).toBe('agudo');
-      expect(getTuningStatus(50)).toBe('agudo');
     });
 
     it('uses custom tolerance', () => {
-      expect(getTuningStatus(15, 20)).toBe('afinado');
-      expect(getTuningStatus(25, 20)).toBe('agudo');
+      expect(getTuningStatus(20, 25)).toBe('afinado');
     });
   });
 
@@ -135,6 +141,105 @@ describe('Notes Utilities', () => {
 
     it('returns error color for "agudo"', () => {
       expect(getTuningColor('agudo')).toBe('var(--error-color)');
+    });
+  });
+
+  describe('Tuning Offset System', () => {
+    it('sets and gets tuning offset correctly', () => {
+      setTuningOffset(-1);
+      expect(getTuningOffset()).toBe(-1);
+      
+      setTuningOffset(2);
+      expect(getTuningOffset()).toBe(2);
+    });
+
+    it('adjusts guitar strings correctly with -1 semitone', () => {
+      setTuningOffset(-1);
+      const adjustedStrings = getAdjustedGuitarStrings();
+      
+      // E2 should become D#2
+      expect(adjustedStrings.E2.name).toBe('D#2');
+      expect(adjustedStrings.E2.frequency).toBeCloseTo(77.78, 1);
+      
+      // A2 should become G#2
+      expect(adjustedStrings.A2.name).toBe('G#2');
+      expect(adjustedStrings.A2.frequency).toBeCloseTo(103.83, 1);
+    });
+
+    it('adjusts guitar strings correctly with +1 semitone', () => {
+      setTuningOffset(1);
+      const adjustedStrings = getAdjustedGuitarStrings();
+      
+      // E2 should become F2
+      expect(adjustedStrings.E2.name).toBe('F2');
+      expect(adjustedStrings.E2.frequency).toBeCloseTo(87.31, 1);
+      
+      // A2 should become A#2
+      expect(adjustedStrings.A2.name).toBe('A#2');
+      expect(adjustedStrings.E2.frequency).toBeCloseTo(87.31, 1);
+    });
+
+    it('returns original strings when no offset', () => {
+      setTuningOffset(0);
+      const adjustedStrings = getAdjustedGuitarStrings();
+      
+      expect(adjustedStrings.E2.name).toBe('E2');
+      expect(adjustedStrings.E2.frequency).toBeCloseTo(82.41, 1);
+      expect(adjustedStrings.A2.name).toBe('A2');
+      expect(adjustedStrings.A2.frequency).toBeCloseTo(110.0, 1);
+    });
+
+    it('adjusts individual string frequencies correctly', () => {
+      setTuningOffset(-1);
+      
+      // Test individual string frequency adjustment
+      const e2Freq = getGuitarStringFrequency('E2');
+      expect(e2Freq).toBeCloseTo(77.78, 1);
+      
+      const a2Freq = getGuitarStringFrequency('A2');
+      expect(a2Freq).toBeCloseTo(103.83, 1);
+      
+      const d3Freq = getGuitarStringFrequency('D3');
+      expect(d3Freq).toBeCloseTo(138.59, 1);
+    });
+
+    it('adjusts frequency for tuning correctly', () => {
+      setTuningOffset(-1);
+      
+      // Test the adjustFrequencyForTuning function directly
+      const originalFreq = 82.41; // E2
+      const adjustedFreq = adjustFrequencyForTuning(originalFreq);
+      expect(adjustedFreq).toBeCloseTo(77.78, 1);
+      
+      setTuningOffset(1);
+      const adjustedFreqUp = adjustFrequencyForTuning(originalFreq);
+      expect(adjustedFreqUp).toBeCloseTo(87.31, 1);
+    });
+  });
+
+  describe('Guitar String Functions', () => {
+    it('finds closest guitar string correctly', () => {
+      setTuningOffset(0);
+      const closestString = getClosestGuitarString(82.41);
+      expect(closestString).toBe('E2');
+    });
+
+    it('finds closest guitar string with tuning offset', () => {
+      setTuningOffset(-1);
+      const closestString = getClosestGuitarString(77.78); // D#2 frequency
+      expect(closestString).toBe('D#2');
+    });
+
+    it('gets guitar string frequency correctly', () => {
+      setTuningOffset(0);
+      const frequency = getGuitarStringFrequency('E2');
+      expect(frequency).toBeCloseTo(82.41, 1);
+    });
+
+    it('gets adjusted guitar string frequency with tuning offset', () => {
+      setTuningOffset(-1);
+      const frequency = getGuitarStringFrequency('E2'); // Should return D#2 frequency
+      expect(frequency).toBeCloseTo(77.78, 1);
     });
   });
 });

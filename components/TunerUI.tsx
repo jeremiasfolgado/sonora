@@ -1,14 +1,30 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Mic, MicOff, AlertCircle, Info } from 'lucide-react';
+import {
+  Mic,
+  MicOff,
+  AlertCircle,
+  Info,
+  Settings,
+  ChevronUp,
+  ChevronDown,
+  RotateCcw,
+} from 'lucide-react';
 import { useTuner } from '../lib/hooks/useTuner';
+import { useTuning } from '../lib/hooks/useTuning';
+import {
+  getGuitarStringFrequency,
+  getAdjustedGuitarStrings,
+} from '../lib/audio/notes';
 import { Needle } from './Needle';
+import { TuningSelector } from './TuningSelector';
 import styles from './TunerUI.module.css';
 
 export function TunerUI() {
   const [isAubioLoaded, setIsAubioLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showTuningModal, setShowTuningModal] = useState(false);
 
   const {
     isListening,
@@ -24,6 +40,32 @@ export function TunerUI() {
     toggleListening,
   } = useTuner();
 
+  const {
+    getAdjustedFrequency,
+    getTuningDisplayName,
+    increaseSemitone,
+    decreaseSemitone,
+    resetTuning,
+    customSemitones,
+    totalSemitones,
+  } = useTuning();
+
+  // Función para obtener la frecuencia objetivo de una cuerda (ajustada por afinación)
+  const getTargetFrequency = (stringName: string): number => {
+    if (!stringName || stringName === '--') {
+      return 0;
+    }
+    
+    const freq = getGuitarStringFrequency(stringName);
+    return freq;
+  };
+
+  // Función para obtener el nombre ajustado de una cuerda según la afinación
+  const getAdjustedStringName = (stringName: string): string => {
+    const adjustedStrings = getAdjustedGuitarStrings();
+    return adjustedStrings[stringName]?.name || stringName;
+  };
+
   // Función para obtener el número de cuerda
   const getStringNumber = (stringName: string): string => {
     const stringMap: { [key: string]: string } = {
@@ -35,19 +77,6 @@ export function TunerUI() {
       E4: '1ª',
     };
     return stringMap[stringName] || '';
-  };
-
-  // Función para obtener la frecuencia objetivo de una cuerda
-  const getTargetFrequency = (stringName: string): number => {
-    const stringMap: { [key: string]: number } = {
-      E2: 82.41,
-      A2: 110.0,
-      D3: 146.83,
-      G3: 196.0,
-      B3: 246.94,
-      E4: 329.63,
-    };
-    return stringMap[stringName] || 0;
   };
 
   // Cargar Aubio.js dinámicamente
@@ -103,12 +132,17 @@ export function TunerUI() {
         (window as unknown as { webkitAudioContext: typeof AudioContext })
           .webkitAudioContext)();
 
-      // Crear oscilador para generar tono A4 (440 Hz)
+      // Crear oscilador para generar tono A4 (440 Hz) ajustado por afinación
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
 
-      // Configurar oscilador
-      oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A4
+      // Configurar oscilador con frecuencia ajustada
+      const baseFrequency = 440; // A4 base
+      const adjustedFrequency = getAdjustedFrequency(baseFrequency);
+      oscillator.frequency.setValueAtTime(
+        adjustedFrequency,
+        audioContext.currentTime
+      );
       oscillator.type = 'sine';
 
       // Configurar ganancia (volumen)
@@ -126,7 +160,11 @@ export function TunerUI() {
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 2);
 
-      console.log('🎵 Tono de prueba A4 (440 Hz) generado');
+      console.log(
+        `🎵 Tono de prueba A4 ajustado (${adjustedFrequency.toFixed(
+          1
+        )} Hz) generado`
+      );
 
       // Limpiar después de 2 segundos
       setTimeout(() => {
@@ -138,7 +176,7 @@ export function TunerUI() {
   };
 
   // Función para generar tonos de cuerdas de guitarra específicas
-  const testGuitarString = (frequency: number, stringName: string) => {
+  const testGuitarString = (stringName: string) => {
     if (!isSupported) return;
 
     try {
@@ -149,7 +187,13 @@ export function TunerUI() {
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
 
-      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+      // Obtener la frecuencia ajustada de la cuerda
+      const adjustedFrequency = getGuitarStringFrequency(stringName);
+
+      oscillator.frequency.setValueAtTime(
+        adjustedFrequency,
+        audioContext.currentTime
+      );
       oscillator.type = 'sine';
 
       gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
@@ -164,7 +208,11 @@ export function TunerUI() {
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 3);
 
-      console.log(`🎸 Tono de prueba ${stringName} (${frequency} Hz) generado`);
+      console.log(
+        `🎸 Tono de prueba ${stringName} ajustado (${adjustedFrequency.toFixed(
+          1
+        )} Hz) generado`
+      );
 
       setTimeout(() => {
         audioContext.close();
@@ -242,7 +290,11 @@ export function TunerUI() {
         {isListening && currentFrequency > 0 && (
           <div className={styles.stringIndicator}>
             <span className={styles.stringLabel}>Cuerda:</span>
-            <span className={styles.stringName}>{closestString}</span>
+            <span className={styles.stringName}>
+              {closestString && closestString !== '--'
+                ? getAdjustedStringName(closestString)
+                : closestString}
+            </span>
             <span className={styles.stringNumber}>
               {getStringNumber(closestString)}
             </span>
@@ -279,6 +331,16 @@ export function TunerUI() {
             )}
           </button>
 
+          {/* Botón de configuración */}
+          <button
+            className={styles.settingsButton}
+            onClick={() => setShowTuningModal(true)}
+            title="Configurar afinación"
+          >
+            <Settings size={20} />
+            <span>{getTuningDisplayName()}</span>
+          </button>
+
           {/* Botón de prueba compacto */}
           <button
             className={styles.testButton}
@@ -287,6 +349,48 @@ export function TunerUI() {
           >
             🎵 Probar
           </button>
+        </div>
+
+        {/* Controles de semitonos */}
+        <div className={styles.semitoneControls}>
+          <div className={styles.semitoneHeader}>
+            <span className={styles.semitoneLabel}>Ajuste de Afinación</span>
+            {customSemitones !== 0 && (
+              <span className={styles.semitoneIndicator}>
+                {totalSemitones > 0 ? '+' : ''}
+                {totalSemitones} semitones
+              </span>
+            )}
+          </div>
+
+          <div className={styles.semitoneButtons}>
+            <button
+              className={styles.semitoneButton}
+              onClick={decreaseSemitone}
+              title="Disminuir semitono"
+            >
+              <ChevronDown size={20} />
+              <span>Bajar</span>
+            </button>
+
+            <button
+              className={styles.resetSemitoneButton}
+              onClick={resetTuning}
+              title="Resetear a afinación estándar"
+            >
+              <RotateCcw size={16} />
+              <span>Reset</span>
+            </button>
+
+            <button
+              className={styles.semitoneButton}
+              onClick={increaseSemitone}
+              title="Aumentar semitono"
+            >
+              <ChevronUp size={20} />
+              <span>Subir</span>
+            </button>
+          </div>
         </div>
 
         {/* Información adicional compacta */}
@@ -315,8 +419,19 @@ export function TunerUI() {
               <div className={styles.stringInfo}>
                 <Info size={14} />
                 <span>
-                  <strong>Objetivo:</strong> {getTargetFrequency(closestString)}{' '}
-                  Hz
+                  <strong>Objetivo:</strong>{' '}
+                  {(() => {
+                    if (
+                      !closestString ||
+                      closestString === '--' ||
+                      closestString === ''
+                    ) {
+                      return '0.0 Hz';
+                    }
+
+                    const targetFreq = getTargetFrequency(closestString);
+                    return `${targetFreq.toFixed(1)} Hz`;
+                  })()}
                 </span>
               </div>
             </div>
@@ -355,45 +470,45 @@ export function TunerUI() {
         <div className={styles.stringButtons}>
           <button
             className={styles.stringButton}
-            onClick={() => testGuitarString(82.41, 'E2')}
+            onClick={() => testGuitarString('E2')}
             disabled={!isSupported}
           >
-            E2 (6ª)
+            {getAdjustedStringName('E2')} (6ª)
           </button>
           <button
             className={styles.stringButton}
-            onClick={() => testGuitarString(110.0, 'A2')}
+            onClick={() => testGuitarString('A2')}
             disabled={!isSupported}
           >
-            A2 (5ª)
+            {getAdjustedStringName('A2')} (5ª)
           </button>
           <button
             className={styles.stringButton}
-            onClick={() => testGuitarString(146.83, 'D3')}
+            onClick={() => testGuitarString('D3')}
             disabled={!isSupported}
           >
-            D3 (4ª)
+            {getAdjustedStringName('D3')} (4ª)
           </button>
           <button
             className={styles.stringButton}
-            onClick={() => testGuitarString(196.0, 'G3')}
+            onClick={() => testGuitarString('G3')}
             disabled={!isSupported}
           >
-            G3 (3ª)
+            {getAdjustedStringName('G3')} (3ª)
           </button>
           <button
             className={styles.stringButton}
-            onClick={() => testGuitarString(246.94, 'B3')}
+            onClick={() => testGuitarString('B3')}
             disabled={!isSupported}
           >
-            B3 (2ª)
+            {getAdjustedStringName('B3')} (2ª)
           </button>
           <button
             className={styles.stringButton}
-            onClick={() => testGuitarString(329.63, 'E4')}
+            onClick={() => testGuitarString('E4')}
             disabled={!isSupported}
           >
-            E4 (1ª)
+            {getAdjustedStringName('E4')} (1ª)
           </button>
         </div>
       </div>
@@ -402,6 +517,29 @@ export function TunerUI() {
       <div className={styles.footer}>
         <p>Sonora - Herramientas Musicales</p>
       </div>
+
+      {/* Modal de configuración de afinación */}
+      {showTuningModal && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setShowTuningModal(false)}
+        >
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Configuración de Afinación</h3>
+              <button
+                className={styles.closeButton}
+                onClick={() => setShowTuningModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className={styles.modalContent}>
+              <TuningSelector />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
