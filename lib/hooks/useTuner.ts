@@ -118,7 +118,7 @@ export function useTuner(): UseTunerReturn {
       // Verificación adicional después de 2 segundos (para casos edge)
       setTimeout(checkSupport, 2000);
     }
-  }, []);
+  }, [state.forceSupported]);
 
   // Inicializar analizador solo cuando esté soportado
   useEffect(() => {
@@ -156,7 +156,7 @@ export function useTuner(): UseTunerReturn {
     };
 
     initAnalyzer();
-  }, [state.isSupported]);
+  }, [state.isSupported, state.forceSupported]);
 
   // Configurar listener para frecuencias detectadas
   useEffect(() => {

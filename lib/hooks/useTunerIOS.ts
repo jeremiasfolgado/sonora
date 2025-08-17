@@ -4,7 +4,6 @@ import { useAudioContext } from './useAudioContext';
 interface UseTunerIOSReturn {
   isListening: boolean;
   currentFrequency: number;
-  currentNote: unknown;
   error: string | null;
   isSupported: boolean;
   isIOS: boolean;
@@ -24,7 +23,6 @@ export function useTunerIOS(): UseTunerIOSReturn {
 
   const [isListening, setIsListening] = useState(false);
   const [currentFrequency, setCurrentFrequency] = useState(0);
-  const [currentNote, setCurrentNote] = useState<unknown>(null);
   const [error, setError] = useState<string | null>(null);
 
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -207,7 +205,6 @@ export function useTunerIOS(): UseTunerIOSReturn {
   return {
     isListening,
     currentFrequency,
-    currentNote,
     error,
     isSupported,
     isIOS,
